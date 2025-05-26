@@ -1,1 +1,16 @@
-
+{
+  "licenses": [
+    {
+      "key": "UL-94f2c03f1d9e4f67a82b13d7fa915da2",
+      "user": "CLONE",
+      "date": "2025-05-26",
+      "valid_until": null
+    },
+    {
+      "key": "TL-61b2d51a7ec64e5f90c672312ffcbc89",
+      "user": "İBNE TOM",
+      "date": "2025-05-26",
+      "valid_until": "2025-08-26"
+    }
+  ]
+}
