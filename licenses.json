@@ -1,0 +1,6 @@
+{
+  "licenses": [
+    { "key": "ABC123", "expires": "2025-07-01" },
+    { "key": "XYZ789", "expires": "2025-12-31" }
+  ]
+}
