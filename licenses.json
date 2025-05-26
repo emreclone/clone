@@ -1,16 +1,16 @@
 {
   "licenses": [
     {
-      "key": "ABC123",
-      "user": "Ahmet Yılmaz",
-      "date": "2024-05-26",
-      "valid_until": "2025-07-01"
+      "key": "UL-94f2c03f1d9e4f67a82b13d7fa915da2",
+      "user": "CLONE",
+      "date": "2025-05-26",
+      "valid_until": null
     },
     {
-      "key": "XYZ789",
-      "user": "Mehmet Kaya",
-      "date": "2024-06-01",
-      "valid_until": "2025-12-31"
+      "key": "TL-61b2d51a7ec64e5f90c672312ffcbc89",
+      "user": "İBNE TOM",
+      "date": "2025-05-26",
+      "valid_until": "2025-08-26"
     }
   ]
 }
