@@ -1,3 +1,4 @@
+git config --global http.sslVerify false
 {
   "licenses": [
     {
