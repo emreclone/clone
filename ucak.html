@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bizon</title>
+  <style>
+    body { margin: 0; background: #111; color: #0f0; font-family: monospace; }
+    canvas { display: block; margin: 20px auto; background: #222; }
+    #cashoutBtn {
+      position: absolute; top: 10px; left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px; font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="300"></canvas>
+  <button id="cashoutBtn">💸 Cash Out</button>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let x = 20, y = 150, multiplier = 1.0, crashed = false;
+    let gameInterval = null;
+    let running = true;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "20px monospace";
+      ctx.fillText("✈️", x, y);
+      ctx.fillText(`x${multiplier.toFixed(2)}`, 10, 20);
+    }
+
+    function update() {
+      if (!running) return;
+      x += 2;
+      y -= 0.3;
+      multiplier += 0.05;
+
+      if (Math.random() < 0.01) {
+        crashed = true;
+        running = false;
+        clearInterval(gameInterval);
+        alert("💥 Uçak düştü!");
+        sendResult(false);
+      }
+
+      draw();
+    }
+
+    gameInterval = setInterval(update, 100);
+
+    document.getElementById("cashoutBtn").onclick = () => {
+      if (!running) return;
+      running = false;
+      clearInterval(gameInterval);
+      alert("✅ Cash out başarılı!");
+      sendResult(true);
+    }
+
+    function sendResult(success) {
+      const payload = {
+        user_id: Telegram.WebApp.initDataUnsafe.user.id,
+        multiplier: multiplier,
+        success: success
+      };
+
+      fetch("/result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(res => res.json()).then(data => {
+        Telegram.WebApp.close();
+      });
+    }
+
+    Telegram.WebApp.ready();
+  </script>
+</body>
+</html>
