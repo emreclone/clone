@@ -1,138 +1,136 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>✈️ Aviator Cash Out Oyunu</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      background: linear-gradient(to bottom, #002244, #004466);
-      color: white;
-      margin: 0;
-      padding: 0;
-    }
-
-    h1 {
-      padding: 20px;
-    }
-
-    #game-area {
-      position: relative;
-      width: 100%;
-      height: 300px;
-      overflow: hidden;
-      background: linear-gradient(to bottom, #001122, #003344);
-      border-top: 2px solid #00ffff55;
-      border-bottom: 2px solid #00ffff55;
-    }
-
-    #airplane {
-      position: absolute;
-      top: 130px;
-      left: 0;
-      width: 64px;
-      transition: left 0.05s linear;
-    }
-
-    #controls {
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 12px 20px;
-      font-size: 16px;
-      background-color: #00bcd4;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      margin: 5px;
-    }
-
-    #multiplier {
-      font-size: 32px;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    #result {
-      font-size: 20px;
-      margin-top: 10px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Uçak Oyunu</title>
+<style>
+  body {
+    background: #121212;
+    margin: 0; padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+  #game-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #002200, #004400);
+  }
+  #plane {
+    position: absolute;
+    width: 60px;
+    top: 120px;
+    left: -60px;
+    animation: flyRight 4s linear forwards;
+  }
+  @keyframes flyRight {
+    0% { left: -60px; transform: rotate(0deg); }
+    50% { transform: rotate(10deg); }
+    100% { left: 320px; transform: rotate(0deg);}
+  }
+  #btn-cashout {
+    margin-top: 20px;
+    padding: 10px 25px;
+    font-size: 1.2rem;
+    background: #00ff99;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #121212;
+  }
+  #status {
+    margin-top: 15px;
+    font-size: 1rem;
+  }
+</style>
 </head>
 <body>
-  <h1>✈️ Aviator - Cash Out Oyunu</h1>
-  <div id="game-area">
-    <!-- SVG Uçak -->
-    <svg id="airplane" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-      <path fill="white" d="M240 128L40 24a8 8 0 0 0-11.13 9.78L48.8 104 24 120a8 8 0 0 0 0 13.9l24.8 16.12L28.87 222.2A8 8 0 0 0 40 232l200-104a8 8 0 0 0 0-14ZM53.87 211.81L69.35 144h39.27l56 56Zm63.73-80H73.35l-12.8-8.34L60.36 128l.19-.11L73.35 120h44.25l56-56 42.87 64Z"/>
-    </svg>
-  </div>
+<div id="game-container">
+  <!-- Uçak SVG (rastgele renkli) -->
+  <svg id="plane" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path id="plane-path" fill="#00ff99" d="M256 0L317 192H256L317 320L256 512L195 320L256 192H195L256 0Z"/>
+  </svg>
+</div>
+<button id="btn-cashout" disabled>💰 Cash Out</button>
+<div id="status">Başlamak için uçağın hareketini bekle...</div>
 
-  <div id="multiplier">1.00x</div>
-  <div id="result"></div>
+<script>
+  const plane = document.getElementById('plane');
+  const btnCashOut = document.getElementById('btn-cashout');
+  const status = document.getElementById('status');
 
-  <div id="controls">
-    <button onclick="startGame()">🎮 BAŞLAT</button>
-    <button onclick="cashOut()">💰 CASH OUT</button>
-  </div>
-
-  <script>
-    let multiplier = 1.0;
-    let interval;
-    let isPlaying = false;
-    let hasCashedOut = false;
-    let airplane = document.getElementById('airplane');
-    let multiplierDisplay = document.getElementById('multiplier');
-    let resultDisplay = document.getElementById('result');
-    let airplaneX = 0;
-
-    function resetGame() {
-      multiplier = 1.0;
-      multiplierDisplay.textContent = multiplier.toFixed(2) + 'x';
-      resultDisplay.textContent = '';
-      hasCashedOut = false;
-      airplaneX = 0;
-      airplane.style.left = airplaneX + 'px';
+  // Rastgele renk seçimi
+  function randomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for(let i=0; i<6; i++){
+      color += letters[Math.floor(Math.random()*16)];
     }
+    return color;
+  }
 
-    function startGame() {
-      if (isPlaying) return;
-      resetGame();
-      isPlaying = true;
+  // Uçak rengini ayarla
+  document.getElementById('plane-path').setAttribute('fill', randomColor());
 
-      interval = setInterval(() => {
-        multiplier += 0.05;
-        airplaneX += 4;
-        multiplierDisplay.textContent = multiplier.toFixed(2) + 'x';
-        airplane.style.left = airplaneX + 'px';
+  // Animasyon süresi
+  const animationDuration = 4000; // 4 saniye
 
-        // Uçak rastgele düşebilir
-        if (Math.random() < 0.01 * multiplier || multiplier > 5.0) {
-          endGame();
-        }
-      }, 100);
-    }
+  let cashOutDone = false;
+  let cashOutTime = 0;
 
-    function endGame() {
-      clearInterval(interval);
-      isPlaying = false;
+  function startGame(){
+    status.textContent = "Uçak kalktı! Hemen Cash Out yapabilirsiniz!";
+    btnCashOut.disabled = false;
+    cashOutDone = false;
+    cashOutTime = 0;
+    plane.style.animationPlayState = "running";
 
-      if (!hasCashedOut) {
-        resultDisplay.innerHTML = `💥 Uçak düştü! <br> ❌ Kayıp: -${(multiplier * 10).toFixed(0)} puan`;
+    setTimeout(() => {
+      if (!cashOutDone) {
+        status.textContent = "💥 Uçak düştü! Kaybettiniz.";
+        btnCashOut.disabled = true;
+        sendResultToBot("lose", 100);  // 100 TL örnek bahis
       }
-    }
+    }, animationDuration);
+  }
 
-    function cashOut() {
-      if (!isPlaying || hasCashedOut) return;
-      hasCashedOut = true;
-      clearInterval(interval);
-      isPlaying = false;
+  btnCashOut.addEventListener('click', () => {
+    if (!cashOutDone) {
+      cashOutDone = true;
+      btnCashOut.disabled = true;
+      plane.style.animationPlayState = "paused";
 
-      resultDisplay.innerHTML = `✅ Cash out yapıldı! <br> 🎯 Kazanç: +${(multiplier * 10).toFixed(0)} puan`;
+      // Örnek: kazandığın miktar animasyonun yüzde kaçında cash out yaptıysan ona göre
+      // burada basitçe %50 zamanında cash out yapmış gibi
+      const kazanilan = Math.floor(Math.random() * 500) + 50; // 50-550 TL arası rastgele
+
+      status.textContent = `🎉 Cash Out yapıldı! Kazandınız: ${kazanilan} TL`;
+
+      sendResultToBot("win", kazanilan);
     }
-  </script>
+  });
+
+  function sendResultToBot(result, amount){
+    // Telegram WebApp API
+    if(window.Telegram.WebApp){
+      Telegram.WebApp.sendData(JSON.stringify({result, amount}));
+    }
+  }
+
+  // Oyun başladıktan sonra animasyon çalışır
+  plane.style.animationPlayState = "paused";
+  setTimeout(() => {
+    plane.style.animationPlayState = "running";
+    startGame();
+  }, 1000);
+</script>
 </body>
 </html>
