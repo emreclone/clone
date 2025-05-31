@@ -9,6 +9,7 @@
     background: #121212;
     margin: 0; padding: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -17,8 +18,8 @@
   }
   #game-container {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 320px;
+    height: 160px;
     border: 2px solid #00ff99;
     border-radius: 15px;
     overflow: hidden;
@@ -26,15 +27,17 @@
   }
   #plane {
     position: absolute;
-    width: 60px;
-    top: 120px;
-    left: -60px;
-    animation: flyRight 4s linear forwards;
+    top: 50%;
+    left: -80px;
+    width: 80px;
+    height: 80px;
+    transform: translateY(-50%);
+    animation: flyRight 5s linear forwards;
   }
   @keyframes flyRight {
-    0% { left: -60px; transform: rotate(0deg); }
-    50% { transform: rotate(10deg); }
-    100% { left: 320px; transform: rotate(0deg);}
+    0% { left: -80px; transform: translateY(-50%) rotate(0deg);}
+    50% { transform: translateY(-55%) rotate(15deg);}
+    100% { left: 340px; transform: translateY(-50%) rotate(0deg);}
   }
   #btn-cashout {
     margin-top: 20px;
@@ -49,55 +52,43 @@
   #status {
     margin-top: 15px;
     font-size: 1rem;
+    height: 1.5em;
   }
 </style>
 </head>
 <body>
 <div id="game-container">
-  <!-- Uçak SVG (rastgele renkli) -->
-  <svg id="plane" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path id="plane-path" fill="#00ff99" d="M256 0L317 192H256L317 320L256 512L195 320L256 192H195L256 0Z"/>
-  </svg>
+  <!-- Uçak PNG -->
+  <img
+    id="plane"
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Plane_icon.svg/120px-Plane_icon.svg.png"
+    alt="Uçak"
+  />
 </div>
 <button id="btn-cashout" disabled>💰 Cash Out</button>
-<div id="status">Başlamak için uçağın hareketini bekle...</div>
+<div id="status">Başlamak için uçağın kalkışını bekleyin...</div>
 
 <script>
   const plane = document.getElementById('plane');
   const btnCashOut = document.getElementById('btn-cashout');
   const status = document.getElementById('status');
 
-  // Rastgele renk seçimi
-  function randomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for(let i=0; i<6; i++){
-      color += letters[Math.floor(Math.random()*16)];
-    }
-    return color;
-  }
-
-  // Uçak rengini ayarla
-  document.getElementById('plane-path').setAttribute('fill', randomColor());
-
-  // Animasyon süresi
-  const animationDuration = 4000; // 4 saniye
+  const animationDuration = 5000; // 5 saniye
 
   let cashOutDone = false;
-  let cashOutTime = 0;
 
-  function startGame(){
-    status.textContent = "Uçak kalktı! Hemen Cash Out yapabilirsiniz!";
+  function startGame() {
+    status.textContent = "Uçak kalktı! Cash Out yapabilirsiniz!";
     btnCashOut.disabled = false;
     cashOutDone = false;
-    cashOutTime = 0;
+
     plane.style.animationPlayState = "running";
 
     setTimeout(() => {
       if (!cashOutDone) {
         status.textContent = "💥 Uçak düştü! Kaybettiniz.";
         btnCashOut.disabled = true;
-        sendResultToBot("lose", 100);  // 100 TL örnek bahis
+        sendResultToBot("lose", 100); // Örnek bahis 100 TL
       }
     }, animationDuration);
   }
@@ -108,9 +99,8 @@
       btnCashOut.disabled = true;
       plane.style.animationPlayState = "paused";
 
-      // Örnek: kazandığın miktar animasyonun yüzde kaçında cash out yaptıysan ona göre
-      // burada basitçe %50 zamanında cash out yapmış gibi
-      const kazanilan = Math.floor(Math.random() * 500) + 50; // 50-550 TL arası rastgele
+      // Rastgele kazanç (50-550 TL)
+      const kazanilan = Math.floor(Math.random() * 500) + 50;
 
       status.textContent = `🎉 Cash Out yapıldı! Kazandınız: ${kazanilan} TL`;
 
@@ -118,17 +108,15 @@
     }
   });
 
-  function sendResultToBot(result, amount){
-    // Telegram WebApp API
-    if(window.Telegram.WebApp){
-      Telegram.WebApp.sendData(JSON.stringify({result, amount}));
+  function sendResultToBot(result, amount) {
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.sendData(JSON.stringify({ result, amount }));
     }
   }
 
-  // Oyun başladıktan sonra animasyon çalışır
+  // Animasyon başlangıçta duruyor, 1 saniye sonra başlar
   plane.style.animationPlayState = "paused";
   setTimeout(() => {
-    plane.style.animationPlayState = "running";
     startGame();
   }, 1000);
 </script>
