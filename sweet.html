@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sweet Spin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: sans-serif; background: #ffe9f3; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(6, 60px); gap: 5px; justify-content: center; margin: 20px 0; }
+    .cell { width: 60px; height: 60px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .spin-btn { background: #ff66a5; color: white; padding: 10px 20px; border: none; font-size: 16px; border-radius: 10px; cursor: pointer; }
+    .spin-btn:disabled { background: #999; }
+  </style>
+</head>
+<body>
+  <h1>🍬 Sweet Spin</h1>
+  <p>Bahis: 
+    <select id="bet">
+      <option value="0.20">0.20</option>
+      <option value="0.50">0.50</option>
+      <option value="1.00">1.00</option>
+    </select> puan
+  </p>
+  <button class="spin-btn" onclick="startGame()" id="spinBtn">8 Spin Başlat</button>
+  <div class="grid" id="grid"></div>
+  <h2 id="result"></h2>
+
+  <script>
+    const symbols = ['🍇', '🍉', '🍋', '🍒', '🍎', '🍍'];
+    const multipliers = [0, 2, 5, 10, 25, 50];
+    let totalWin = 0;
+    let spin = 0;
+
+    function getRandomSymbol() {
+      return symbols[Math.floor(Math.random() * symbols.length)];
+    }
+
+    function getRandomMultiplier() {
+      return multipliers[Math.floor(Math.random() * multipliers.length)];
+    }
+
+    function drawGrid() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = '';
+      for (let i = 0; i < 30; i++) {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.textContent = getRandomSymbol();
+        grid.appendChild(div);
+      }
+    }
+
+    function startGame() {
+      const bet = parseFloat(document.getElementById("bet").value);
+      const spinBtn = document.getElementById("spinBtn");
+      spinBtn.disabled = true;
+      totalWin = 0;
+      spin = 0;
+
+      const interval = setInterval(() => {
+        drawGrid();
+        const x = getRandomMultiplier();
+        const win = bet * x;
+        totalWin += win;
+        document.getElementById("result").textContent = `Spin ${spin + 1}/8 ➤ x${x} = ${win.toFixed(2)} puan`;
+
+        spin++;
+        if (spin >= 8) {
+          clearInterval(interval);
+          document.getElementById("result").textContent += `\n🎉 Toplam Kazanç: ${totalWin.toFixed(2)} puan`;
+          // BURADA Telegram API ile puan güncellemesi yapılabilir
+          spinBtn.disabled = false;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
